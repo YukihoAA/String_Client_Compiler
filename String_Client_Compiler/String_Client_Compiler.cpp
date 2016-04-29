@@ -9,6 +9,8 @@ using namespace std;
 
 	ID문자열은 0a xx 0a xx 다음에 시작하지만 가끔 0a xx yy 0x xx (yy는 80 이하의 숫자)로 시작하는 경우가 있다.
 
+	yy는 d로 저장된다.
+
 	xx는 0a가 와서는 안된다. 0a0a는 str의 내용이기 때문이다.
 
 	두번째 xx (b)는 ID 문자열의 길이이다.
@@ -43,7 +45,7 @@ int main(int argc, char *argv[])
 			return 0;
 		}
 		fp = fopen(argv[2], "rb");
-		txt = fopen(argv[3], "w+");
+		txt = fopen(argv[3], "wb+");
 
 		try {
 			if (fgetc(fp) != 0x0a)		//시작은 무조건 0a
@@ -95,7 +97,12 @@ int main(int argc, char *argv[])
 						if (i >= 2000)
 							throw "ERR: Need more str string buffer in source code";
 						str[i] = fgetc(fp);
-						if (str[i] == 0x0a)	//개행인지 판단
+						if (str[i]==EOF)
+						{
+							str[i] = 0;
+							break;
+						}
+						else if (str[i] == 0x0a)	//개행인지 판단
 						{
 							tmp = 0;
 							if (fgetc(fp) == 0x0a)	//str의 내용일경우
@@ -129,7 +136,11 @@ int main(int argc, char *argv[])
 							fseek(fp, -2, SEEK_CUR);	//다음줄 아니였어 그러면 다시 돌려놓고 계속 입력받기
 						}
 					}
-				fprintf(txt, "%d %d %d %d %d %s\n%s\n\n", a, b, c, d, e, id, str);
+					fprintf(txt, "%d %d %d %d %d %s", a, b, c, d, e, id);
+					fputc(0x0a, txt);
+					fprintf(txt, "%s", str);
+					fputc(0x0a, txt);
+					fputc(0x0a, txt);
 			}
 			cout << endl << "decompile finished." << endl;
 			cout << endl << "<!--Important--!>" << endl;
@@ -155,13 +166,79 @@ int main(int argc, char *argv[])
 			cout << "exits..." << endl;
 			return 0;
 		}
-		fp = fopen(argv[2], "wb+");
-		txt = fopen(argv[3], "r");
+		try {
+			fp = fopen(argv[2], "wb+");
+			txt = fopen(argv[3], "rb");
 
+			for (; !feof(txt);)
+			{
+				a = 0, b = 0, c = 0, d = 0, e = 0, i = 0;
+				fscanf(txt, "%d %d %d %d %d %[^\n]", &a, &b, &c, &d, &e, id);
+				fgetc(txt);	// 0a제거
+				cout << a << b << c << d << e << id << endl;
+				
+				for (int i=0; !feof(txt); i++)
+				{
+					if (i >= 2000)
+						throw "ERR: Need more str string buffer in source code";
+					str[i] = fgetc(txt);
+					if (str[i] == 0x0a)
+					{
+						if (fgetc(txt) == 0x0a)
+						{
+							tmp = fgetc(txt);
+							if (feof(txt))
+							{
+								str[i] = 0;
+								break;
+							}
+							if (tmp >= '0' && tmp <= '9')
+							{
+								fseek(txt, -1, SEEK_CUR);
+								str[i] = 0;
+								break;
+							}
+							fseek(txt, -1, SEEK_CUR);
+						}
+						fseek(txt, -1, SEEK_CUR);
+					}
+				}
+				fputc(0x0a, fp);
+				fputc(a, fp);
+				if (d != 0x0a)
+					fputc(d, fp);
+				fputc(0x0a, fp);
+				fputc(b, fp);
+				
+				for (int i=0;;i++)
+				{
+					if (id[i] == 0)
+						break;
+					fputc(id[i], fp);
+				}
+				if (str[0] != 0)
+				{
+					fputc(0x12, fp);
+					fputc(c, fp);
+					if (e != 0)
+						fputc(e, fp);
+					for (int i = 0;; i++)
+					{
+						if (str[i] == 0)
+							break;
+						fputc(str[i], fp);
+					}
+				}
+			}
 
-
-		fclose(fp);
+		}
+		catch (char *e) {
+			cout << e << endl;
+		}
+		catch (...) {
+		}
 		fclose(txt);
+		fclose(fp);
 	}
 	else
 	{
