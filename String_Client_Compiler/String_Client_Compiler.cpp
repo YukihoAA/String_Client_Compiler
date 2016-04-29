@@ -24,7 +24,7 @@ using namespace std;
 
 int main(int argc, char *argv[])
 {
-	FILE *fp, *txt;
+	FILE *fp=NULL, *txt = NULL;
 	int a, b, c, i, d, e, tmp;
 	char id[200], str[2000], sel;
 	if (argc == 1 || !strcmp(argv[1], "help"))
@@ -44,10 +44,18 @@ int main(int argc, char *argv[])
 			cout << "exits..." << endl;
 			return 0;
 		}
-		fp = fopen(argv[2], "rb");
-		txt = fopen(argv[3], "wb+");
-
 		try {
+			fp = fopen(argv[2], "rb");
+			if (!fp)		//파일이 없다면
+			{
+				throw "ERR: No .dat File";
+			}
+			txt = fopen(argv[3], "wb+");
+			if (!txt)		//파일생성이 불가능하다면
+			{
+				throw "ERR: Cannot create new .txt file";
+			}
+
 			if (fgetc(fp) != 0x0a)		//시작은 무조건 0a
 			{
 				throw "ERR: invaild string_client_c.dat file";
@@ -152,8 +160,10 @@ int main(int argc, char *argv[])
 		}
 		catch (...) {
 		}
-		fclose(fp);
-		fclose(txt);
+		if(fp)
+			fclose(fp);
+		if(txt)
+			fclose(txt);
 	}
 	else if (argc == 4 && !strcmp(argv[1], "compile"))
 	{
@@ -167,8 +177,16 @@ int main(int argc, char *argv[])
 			return 0;
 		}
 		try {
-			fp = fopen(argv[2], "wb+");
 			txt = fopen(argv[3], "rb");
+			if (!txt)		//파일이 없다면
+			{
+				throw "ERR: No .txt File";
+			}
+			fp = fopen(argv[2], "wb+");
+			if (!fp)		//파일생성이 불가능하다면
+			{
+				throw "ERR: Cannot create new .dat file";
+			}
 
 			for (; !feof(txt);)
 			{
@@ -237,8 +255,10 @@ int main(int argc, char *argv[])
 		}
 		catch (...) {
 		}
-		fclose(txt);
-		fclose(fp);
+		if (fp)
+			fclose(fp);
+		if (txt)
+			fclose(txt);
 	}
 	else
 	{
