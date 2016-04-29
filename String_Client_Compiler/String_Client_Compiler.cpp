@@ -11,7 +11,9 @@ using namespace std;
 
 	yy는 d로 저장된다.
 
-	xx는 0a가 와서는 안된다. 0a0a는 str의 내용이기 때문이다.
+	첫번째 xx는 0a가 와서는 안된다. 0a0a는 str의 내용이기 때문이다.
+
+	첫번째 xx (a)는 대부분 b+c+4이다.
 
 	두번째 xx (b)는 ID 문자열의 길이이다.
 
@@ -170,7 +172,7 @@ int main(int argc, char *argv[])
 		cout << endl << "info: this is compile mode. this will overwite if .dat file Exists." << endl << endl << "Do you want to continue? (y/n) :";
 
 		cin >> sel;
-
+		
 		if (sel != 'y')
 		{
 			cout << "exits..." << endl;
