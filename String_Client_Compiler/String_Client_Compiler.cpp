@@ -35,6 +35,7 @@ int main(int argc, char *argv[])
 		cout << "\tUsage: scc [mode] \"string_client_c.dat Path\" \".txt Path\"" << endl << endl;
 		cout << "\tmode:\tcompile \t- .txt to dat" << endl;
 		cout << "\t\tdecompile \t- .dat to .txt" << endl;
+		cout << "\t\ttemplate \t- .dat to .txt, without str data" << endl;
 	}
 	else if (argc == 4 && (!strcmp(argv[1], "decompile") || !strcmp(argv[1], "template")))
 	{
