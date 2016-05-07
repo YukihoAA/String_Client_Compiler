@@ -40,7 +40,9 @@ int main(int argc, char *argv[])
 	else if (argc == 4 && (!strcmp(argv[1], "decompile") || !strcmp(argv[1], "template")))
 	{
 		if (!strcmp(argv[1], "template"))
+		{
 			tmplt = true;
+		}
 		if (tmplt) {
 			cout << endl << ">> WARNING: this is template creation mode. this will destroy your work data if .txt file Exists.<<" << endl << endl << "Do you want to continue? (y/n) :";
 		}
