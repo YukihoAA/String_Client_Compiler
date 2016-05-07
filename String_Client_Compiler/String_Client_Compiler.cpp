@@ -28,6 +28,7 @@ int main(int argc, char *argv[])
 {
 	FILE *fp=NULL, *txt = NULL;
 	int a, b, c, i, d, e, tmp;
+	bool tmplt = false;
 	char id[200], str[2000], sel;
 	if (argc == 1 || !strcmp(argv[1], "help"))
 	{
@@ -35,10 +36,17 @@ int main(int argc, char *argv[])
 		cout << "\tmode:\tcompile \t- .txt to dat" << endl;
 		cout << "\t\tdecompile \t- .dat to .txt" << endl;
 	}
-	else if (argc == 4 && !strcmp(argv[1], "decompile"))
+	else if (argc == 4 && (!strcmp(argv[1], "decompile") || !strcmp(argv[1], "template")))
 	{
-		cout << endl << ">> WARNING: this is DEcompile mode. this will destroy your work data if .txt file Exists.<<" << endl << endl << "Do you want to continue? (y/n) :";
-
+		if (!strcmp(argv[1], "template"))
+			tmplt = true;
+		if (tmplt) {
+			cout << endl << ">> WARNING: this is template creation mode. this will destroy your work data if .txt file Exists.<<" << endl << endl << "Do you want to continue? (y/n) :";
+		}
+		else
+		{
+			cout << endl << ">> WARNING: this is DECOMPILE mode. this will destroy your work data if .txt file Exists.<<" << endl << endl << "Do you want to continue? (y/n) :";
+		}
 		cin >> sel;
 
 		if (sel != 'y')
@@ -148,11 +156,19 @@ int main(int argc, char *argv[])
 					}
 					fprintf(txt, "%d %d %d %d %d %s", a, b, c, d, e, id);
 					fputc(0x0a, txt);
-					fprintf(txt, "%s", str);
+					if (!tmplt) {
+						fprintf(txt, "%s", str);
+					}
 					fputc(0x0a, txt);
 					fputc(0x0a, txt);
 			}
-			cout << endl << "decompile finished." << endl;
+			if (!tmplt)
+			{
+				cout << endl << "decompile finished." << endl;
+			}
+			else {
+				cout << endl << "template creation complete." << endl;
+			}
 			cout << endl << "<!--Important--!>" << endl;
 			cout << "You should edit string in same byte (this is multibyte char data)" << endl;
 			cout << "You shouldn't edit binary number data in file (it will corrupt data.jmp)" << endl;
